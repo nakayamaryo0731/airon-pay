@@ -18,5 +18,51 @@ model User {
   name      String
   email     String   @unique
   createdAt DateTime @default(now())
+  groups    GroupMember[]
+  payments  Payment[]
+  splits    Split[]
 }
 
+model Group {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime       @default(now())
+  members     GroupMember[]
+  payments    Payment[]
+}
+
+model GroupMember {
+  id        Int      @id @default(autoincrement())
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  role      String
+  createdAt DateTime @default(now())
+
+  @@unique([groupId, userId])
+}
+
+model Payment {
+  id          Int       @id @default(autoincrement())
+  group       Group     @relation(fields: [groupId], references: [id])
+  groupId     Int
+  payer       User      @relation(fields: [payerId], references: [id])
+  payerId     Int
+  amount      Float
+  category    String?
+  description String?
+  paidAt      DateTime  @default(now())
+  splits      Split[]
+}
+
+model Split {
+  id          Int      @id @default(autoincrement())
+  payment     Payment  @relation(fields: [paymentId], references: [id])
+  paymentId   Int
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  amount      Float
+  percentage  Float?
+}
