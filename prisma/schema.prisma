@@ -51,18 +51,44 @@ model Payment {
   payer       User      @relation(fields: [payerId], references: [id])
   payerId     Int
   amount      Float
-  category    String?
+  category    Category  @relation(fields: [categoryId], references: [id])
+  categoryId  Int       // カテゴリID（外部キー）
   description String?
   paidAt      DateTime  @default(now())
   splits      Split[]
+  tags        PaymentTag[]
 }
 
 model Split {
-  id          Int      @id @default(autoincrement())
-  payment     Payment  @relation(fields: [paymentId], references: [id])
-  paymentId   Int
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
-  amount      Float
-  percentage  Float?
+  id         Int      @id @default(autoincrement())
+  payment    Payment  @relation(fields: [paymentId], references: [id])
+  paymentId  Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  amount     Float
+  percentage Float?
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String // カテゴリ名
+
+  Payment Payment[]
+}
+
+model Tag {
+  id   Int    @id @default(autoincrement())
+  name String // タグ名
+
+  PaymentTag PaymentTag[]
+}
+
+model PaymentTag {
+  id         Int      @id @default(autoincrement())
+  payment    Payment  @relation(fields: [paymentId], references: [id])
+  paymentId  Int
+  tag        Tag      @relation(fields: [tagId], references: [id])
+  tagId      Int
+
+  @@unique([paymentId, tagId]) // 同じ支払いに同じタグを複数回付けられないようにする
 }
