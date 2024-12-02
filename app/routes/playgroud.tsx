@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async () => {
 };
 
 // UI: ホーム画面
-export default function HomePage() {
+export default function PlaygroundPage() {
   const { groups } = useLoaderData<{
     groups: {
       id: number;
