@@ -6,6 +6,7 @@ import {
   groups,
   groupMembers,
   payments,
+  currencies,
 } from "./fixtures";
 
 const db = new PrismaClient();
@@ -72,12 +73,26 @@ async function main() {
     tagMap[tag.name] = createdTag.id;
   }
 
+  // 通貨マスタデータの挿入
+  const currencyMap: { [key: string]: number } = {};
+  for (const currency of currencies) {
+    const createdCurrency = await db.currency.upsert({
+      where: { code: currency.code },
+      update: {},
+      create: currency,
+    });
+    currencyMap[currency.code] = createdCurrency.id;
+  }
+
+    // 支払いデータの挿入
   for (const payment of payments) {
-    const createdPayment = await db.payment.create({
+    await db.payment.create({
       data: {
         groupId: groupMap[payment.groupName],
         payerId: userMap[payment.payerEmail],
         amount: payment.amount,
+        currencyId: currencyMap[payment.currencyCode], // 通貨IDをマッピング
+        exchangeRate: payment.exchangeRate,
         categoryId: categoryMap[payment.categoryName],
         description: payment.description,
         splits: {
@@ -93,7 +108,6 @@ async function main() {
         },
       },
     });
-    console.log(`Seeded payment: ${createdPayment.description}`);
   }
 }
 

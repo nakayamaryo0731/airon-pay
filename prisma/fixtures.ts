@@ -26,11 +26,19 @@ export const groupMembers = [
   { groupName: "Household", userEmail: "bob@example.com", role: "member" },
 ];
 
+export const currencies = [
+  { code: "USD", name: "Dollar (US)" },
+  { code: "JPY", name: "Yen (JP)" },
+  { code: "EUR", name: "Euro" },
+];
+
 export const payments = [
   {
     groupName: "Household",
     payerEmail: "alice@example.com",
     amount: 100.0,
+    currencyCode: "USD", // 通貨コード
+    exchangeRate: 110.5, // 為替レート
     categoryName: "Groceries",
     description: "Weekly grocery shopping",
     splits: [

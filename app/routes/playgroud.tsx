@@ -2,20 +2,19 @@ import { LoaderFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { db } from "~/db.server";
 
-// Loader: データベースからGroup, GroupMember, Paymentを取得
+// Loader: Group, GroupMember, Payment, Currencyを取得
 export const loader: LoaderFunction = async () => {
   try {
     const groups = await db.group.findMany({
       include: {
         members: {
-          include: {
-            user: true,
-          },
+          include: { user: true },
         },
         payments: {
           include: {
             payer: true,
             category: true,
+            currency: true, // 通貨情報を取得
           },
         },
       },
@@ -39,6 +38,8 @@ export default function HomePage() {
       payments: {
         id: number;
         amount: number;
+        currency: { code: string };
+        exchangeRate: number | null;
         description: string | null;
         category: { name: string };
         payer: { name: string };
@@ -94,8 +95,14 @@ export default function HomePage() {
                         {payment.payer.name}
                       </span>{" "}
                       <span className="text-gray-600">
-                        paid {payment.amount.toFixed(2)} ({payment.category.name})
+                        paid {payment.amount.toFixed(2)} {payment.currency.code}
                       </span>
+                      {payment.exchangeRate && (
+                        <span className="text-sm text-gray-500">
+                          {" "}
+                          (Exchange Rate: {payment.exchangeRate.toFixed(2)})
+                        </span>
+                      )}
                     </div>
                     <div className="text-sm text-gray-500">
                       {new Date(payment.paidAt).toLocaleDateString()}

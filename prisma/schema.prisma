@@ -45,18 +45,29 @@ model GroupMember {
 }
 
 model Payment {
-  id          Int       @id @default(autoincrement())
-  group       Group     @relation(fields: [groupId], references: [id])
-  groupId     Int
-  payer       User      @relation(fields: [payerId], references: [id])
-  payerId     Int
-  amount      Float
-  category    Category  @relation(fields: [categoryId], references: [id])
-  categoryId  Int       // カテゴリID（外部キー）
-  description String?
-  paidAt      DateTime  @default(now())
-  splits      Split[]
-  tags        PaymentTag[]
+  id           Int       @id @default(autoincrement())
+  group        Group     @relation(fields: [groupId], references: [id])
+  groupId      Int
+  payer        User      @relation(fields: [payerId], references: [id])
+  payerId      Int
+  amount       Float     // 支払額（元の通貨での金額）
+  currency     Currency  @relation(fields: [currencyId], references: [id])
+  currencyId   Int       // 通貨ID（外部キー）
+  exchangeRate Float?    // 為替レート（例: 1 USD = X JPY）
+  category     Category  @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  description  String?
+  paidAt       DateTime  @default(now())
+  splits       Split[]
+  tags         PaymentTag[]
+}
+
+model Currency {
+  id   Int    @id @default(autoincrement())
+  code String @unique // 通貨コード（ISO 4217形式）
+  name String         // 通貨名（例: Japanese Yen, US Dollar）
+
+  Payment Payment[]
 }
 
 model Split {
