@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async () => {
           include: {
             payer: true,
             category: true,
-            currency: true, // 通貨情報を取得
+            currency: true,
           },
         },
       },
@@ -55,25 +55,29 @@ export default function PlaygroundPage() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Home</h1>
-      {groups.map(group => (
+      {groups.map((group) => (
         <div
           key={group.id}
           className="bg-white shadow-lg rounded-lg mb-6 p-6 border border-gray-200"
         >
           {/* グループ情報 */}
           <h2 className="text-2xl font-semibold text-gray-800">{group.name}</h2>
-          <p className="text-gray-600 mt-2">{group.description || "No description provided."}</p>
+          <p className="text-gray-600 mt-2">
+            {group.description || "No description provided."}
+          </p>
 
           {/* メンバーセクション */}
           <div className="mt-6">
             <h3 className="text-lg font-medium text-gray-800 mb-4">Members</h3>
             <ul className="space-y-2">
-              {group.members.map(member => (
+              {group.members.map((member) => (
                 <li
                   key={member.user.name}
                   className="flex items-center space-x-3 bg-gray-100 rounded-lg p-3"
                 >
-                  <div className="font-medium text-gray-700">{member.user.name}</div>
+                  <div className="font-medium text-gray-700">
+                    {member.user.name}
+                  </div>
                   <div className="text-sm text-gray-500">({member.role})</div>
                 </li>
               ))}
@@ -84,7 +88,7 @@ export default function PlaygroundPage() {
           <div className="mt-6">
             <h3 className="text-lg font-medium text-gray-800 mb-4">Payments</h3>
             <ul className="space-y-4">
-              {group.payments.map(payment => (
+              {group.payments.map((payment) => (
                 <li
                   key={payment.id}
                   className="bg-gray-100 rounded-lg p-4 border border-gray-200 shadow-sm"
@@ -109,7 +113,9 @@ export default function PlaygroundPage() {
                     </div>
                   </div>
                   {payment.description && (
-                    <p className="mt-2 text-gray-700 text-sm">{payment.description}</p>
+                    <p className="mt-2 text-gray-700 text-sm">
+                      {payment.description}
+                    </p>
                   )}
                 </li>
               ))}
