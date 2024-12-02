@@ -1,89 +1,104 @@
 import { PrismaClient } from "@prisma/client";
+import {
+  categories,
+  tags,
+  users,
+  groups,
+  groupMembers,
+  payments,
+} from "./fixtures";
 
 const db = new PrismaClient();
 
 async function main() {
   console.log("Seeding data...");
 
-  // カテゴリマスタデータ
-  const categories = await db.category.createMany({
-    data: [
-      { name: "Groceries" },
-      { name: "Utilities" },
-      { name: "Entertainment" },
-      { name: "Transport" },
-    ],
-  });
+  // カテゴリの挿入
+  await db.category.createMany({ data: categories });
+  console.log(`Seeded ${categories.length} categories.`);
 
-  console.log(`Seeded ${categories.count} categories.`);
+  // タグの挿入
+  await db.tag.createMany({ data: tags });
+  console.log(`Seeded ${tags.length} tags.`);
 
-  // タグマスタデータ
-  const tags = await db.tag.createMany({
-    data: [
-      { name: "Urgent" },
-      { name: "Work" },
-      { name: "Personal" },
-      { name: "Recurring" },
-    ],
-  });
+  // ユーザーの挿入
+  const userMap: { [key: string]: number } = {};
+  for (const user of users) {
+    const createdUser = await db.user.upsert({
+      where: { email: user.email },
+      update: {},
+      create: user,
+    });
+    userMap[user.email] = createdUser.id;
+  }
+  console.log(`Seeded ${users.length} users.`);
 
-  console.log(`Seeded ${tags.count} tags.`);
+  // グループの挿入
+  const groupMap: { [key: string]: number } = {};
+  for (const group of groups) {
+    const createdGroup = await db.group.create({
+      data: group,
+    });
+    groupMap[group.name] = createdGroup.id;
+  }
+  console.log(`Seeded ${groups.length} groups.`);
 
-  // サンプルユーザー
-  const alice = await db.user.create({
-    data: { name: "Alice", email: "alice@example.com" },
-  });
-
-  const bob = await db.user.create({
-    data: { name: "Bob", email: "bob@example.com" },
-  });
-
-  console.log(`Seeded users: ${alice.name}, ${bob.name}.`);
-
-  // サンプルグループ
-  const group = await db.group.create({
-    data: {
-      name: "Household",
-      description: "Shared household expenses",
-      members: {
-        create: [
-          { userId: alice.id, role: "owner" },
-          { userId: bob.id, role: "member" },
-        ],
+  // グループメンバーの挿入
+  for (const member of groupMembers) {
+    await db.groupMember.create({
+      data: {
+        groupId: groupMap[member.groupName],
+        userId: userMap[member.userEmail],
+        role: member.role,
       },
-    },
-  });
+    });
+  }
+  console.log(`Seeded ${groupMembers.length} group members.`);
 
-  console.log(`Seeded group: ${group.name}.`);
+  // 支払いの挿入
+  const categoryMap: { [key: string]: number } = {};
+  for (const category of categories) {
+    const createdCategory = await db.category.findFirstOrThrow({
+      where: { name: category.name },
+    });
+    categoryMap[category.name] = createdCategory.id;
+  }
 
-  // サンプル支払い
-  const payment = await db.payment.create({
-    data: {
-      groupId: group.id,
-      payerId: alice.id,
-      amount: 100.0,
-      categoryId: 1, // Groceries
-      description: "Weekly grocery shopping",
-      splits: {
-        create: [
-          { userId: alice.id, amount: 60.0 },
-          { userId: bob.id, amount: 40.0 },
-        ],
+  const tagMap: { [key: string]: number } = {};
+  for (const tag of tags) {
+    const createdTag = await db.tag.findFirstOrThrow({
+      where: { name: tag.name },
+    });
+    tagMap[tag.name] = createdTag.id;
+  }
+
+  for (const payment of payments) {
+    const createdPayment = await db.payment.create({
+      data: {
+        groupId: groupMap[payment.groupName],
+        payerId: userMap[payment.payerEmail],
+        amount: payment.amount,
+        categoryId: categoryMap[payment.categoryName],
+        description: payment.description,
+        splits: {
+          create: payment.splits.map(split => ({
+            userId: userMap[split.userEmail],
+            amount: split.amount,
+          })),
+        },
+        tags: {
+          create: payment.tags.map(tagName => ({
+            tagId: tagMap[tagName],
+          })),
+        },
       },
-      tags: {
-        create: [
-          { tagId: 1 }, // Urgent
-          { tagId: 4 }, // Recurring
-        ],
-      },
-    },
-  });
-
-  console.log(`Seeded payment: ${payment.description}.`);
+    });
+    console.log(`Seeded payment: ${createdPayment.description}`);
+  }
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error("Error seeding data:", e);
     process.exit(1);
   })
