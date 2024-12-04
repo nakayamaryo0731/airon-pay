@@ -19,6 +19,7 @@
     "*.{ts,tsx}": "prettier --write"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.0.0",
     "@remix-run/node": "^2.15.0",
     "@remix-run/react": "^2.15.0",
