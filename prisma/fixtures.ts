@@ -37,8 +37,8 @@ export const payments = [
     groupName: "Household",
     payerEmail: "alice@example.com",
     amount: 100.0,
-    currencyCode: "USD", // 通貨コード
-    exchangeRate: 110.5, // 為替レート
+    currencyCode: "USD",
+    exchangeRate: 110.5,
     categoryName: "Groceries",
     description: "Weekly grocery shopping",
     splits: [
@@ -46,5 +46,33 @@ export const payments = [
       { userEmail: "bob@example.com", amount: 40.0 },
     ],
     tags: ["Urgent", "Recurring"],
+  },
+  {
+    groupName: "Household",
+    payerEmail: "bob@example.com",
+    amount: 200.0,
+    currencyCode: "JPY",
+    exchangeRate: 1.0,
+    categoryName: "Utilities",
+    description: "Monthly utility bills",
+    splits: [
+      { userEmail: "alice@example.com", amount: 100.0 },
+      { userEmail: "bob@example.com", amount: 100.0 },
+    ],
+    tags: ["Work", "Recurring"],
+  },
+  {
+    groupName: "Household",
+    payerEmail: "alice@example.com",
+    amount: 50.0,
+    currencyCode: "EUR",
+    exchangeRate: 130.0,
+    categoryName: "Transport",
+    description: "Taxi fare for group outing",
+    splits: [
+      { userEmail: "alice@example.com", amount: 25.0 },
+      { userEmail: "bob@example.com", amount: 25.0 },
+    ],
+    tags: ["Personal"],
   },
 ];
