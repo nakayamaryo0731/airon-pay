@@ -34,6 +34,7 @@ export const currencies = [
 
 export const payments = [
   {
+    id: 1,
     groupName: "Household",
     payerEmail: "alice@example.com",
     amount: 100.0,
@@ -48,6 +49,7 @@ export const payments = [
     tags: ["Urgent", "Recurring"],
   },
   {
+    id: 2,
     groupName: "Household",
     payerEmail: "bob@example.com",
     amount: 200.0,
@@ -62,6 +64,7 @@ export const payments = [
     tags: ["Work", "Recurring"],
   },
   {
+    id: 3,
     groupName: "Household",
     payerEmail: "alice@example.com",
     amount: 50.0,

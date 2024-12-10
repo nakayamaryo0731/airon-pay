@@ -17,19 +17,28 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
-  createdAt DateTime @default(now())
-  groups    GroupMember[]
+  groups    Group[]
+  groupMembers    GroupMember[]
   payments  Payment[]
   splits    Split[]
+  tags      Tag[]
+  categories Category[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model Group {
   id          Int           @id @default(autoincrement())
   name        String        @unique
   description String?
-  createdAt   DateTime       @default(now())
   members     GroupMember[]
   payments    Payment[]
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now())
+  createdBy   User           @relation(fields: [createdByUserId], references: [id])
+  createdByUserId Int
 }
 
 model GroupMember {
@@ -39,7 +48,9 @@ model GroupMember {
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   role      String
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   @@unique([groupId, userId])
 }
@@ -57,9 +68,11 @@ model Payment {
   category     Category  @relation(fields: [categoryId], references: [id])
   categoryId   Int
   description  String?
-  paidAt       DateTime  @default(now())
   splits       Split[]
   tags         PaymentTag[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now())
 }
 
 model Currency {
@@ -85,6 +98,11 @@ model Category {
   name String @unique
 
   Payment Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  createdBy User @relation(fields: [createdByUserId], references: [id])
+  createdByUserId Int
 }
 
 model Tag {
@@ -92,6 +110,11 @@ model Tag {
   name String @unique
 
   PaymentTag PaymentTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  createdBy User @relation(fields: [createdByUserId], references: [id])
+  createdByUserId Int
 }
 
 model PaymentTag {

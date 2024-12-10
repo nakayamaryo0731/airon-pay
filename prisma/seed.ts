@@ -10,33 +10,10 @@ import {
 } from "./fixtures";
 
 const db = new PrismaClient();
+const defaultCreatedByUserId = 1;
 
 async function main() {
   console.log("Seeding data...");
-
-  // カテゴリの挿入
-  const categoryMap = new Map<string, number>();
-  for (const category of categories) {
-    const createdCategory = await db.category.upsert({
-      where: { name: category.name },
-      update: {},
-      create: category,
-    });
-    categoryMap.set(category.name, createdCategory.id);
-  }
-  console.log(`Seeded ${categories.length} categories.`);
-
-  // タグの挿入
-  const tagMap = new Map<string, number>();
-  for (const tag of tags) {
-    const createdTag = await db.tag.upsert({
-      where: { name: tag.name },
-      update: {},
-      create: tag,
-    });
-    tagMap.set(tag.name, createdTag.id);
-  }
-  console.log(`Seeded ${tags.length} tags.`);
 
   // ユーザーの挿入
   const userMap = new Map<string, number>();
@@ -50,13 +27,25 @@ async function main() {
   }
   console.log(`Seeded ${users.length} users.`);
 
+  // カテゴリの挿入
+  const categoryMap = new Map<string, number>();
+  for (const category of categories) {
+    const createdCategory = await db.category.upsert({
+      where: { name: category.name },
+      update: {},
+      create: { ...category, createdByUserId: defaultCreatedByUserId },
+    });
+    categoryMap.set(category.name, createdCategory.id);
+  }
+  console.log(`Seeded ${categories.length} categories.`);
+
   // グループの挿入
   const groupMap = new Map<string, number>();
   for (const group of groups) {
     const createdGroup = await db.group.upsert({
       where: { name: group.name },
       update: {},
-      create: group,
+      create: { ...group, createdByUserId: defaultCreatedByUserId },
     });
     groupMap.set(group.name, createdGroup.id);
   }
@@ -93,16 +82,30 @@ async function main() {
   }
   console.log(`Seeded ${currencies.length} currencies.`);
 
+  // タグの挿入
+  const tagMap = new Map<string, number>();
+  for (const tag of tags) {
+    const createdTag = await db.tag.upsert({
+      where: { name: tag.name },
+      update: {},
+      create: { ...tag, createdByUserId: defaultCreatedByUserId },
+    });
+    tagMap.set(tag.name, createdTag.id);
+  }
+  console.log(`Seeded ${tags.length} tags.`);
+
   // 支払いデータの挿入
   for (const payment of payments) {
-    await db.payment.create({
-      data: {
+    await db.payment.upsert({
+      where: { id: payment.id },
+      update: {},
+      create: {
         groupId: groupMap.get(payment.groupName)!,
         payerId: userMap.get(payment.payerEmail)!,
         amount: payment.amount,
-        currencyId: currencyMap.get(payment.currencyCode)!, // 通貨ID
-        exchangeRate: payment.exchangeRate, // 為替レート
-        categoryId: categoryMap.get(payment.categoryName)!, // カテゴリID
+        currencyId: currencyMap.get(payment.currencyCode)!,
+        exchangeRate: payment.exchangeRate,
+        categoryId: categoryMap.get(payment.categoryName)!,
         description: payment.description,
         splits: {
           create: payment.splits.map((split) => ({
