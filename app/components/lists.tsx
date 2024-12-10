@@ -1,24 +1,28 @@
-export default function Lists() {
-  const mockPayments = [
-    { id: 1, description: "Groceries", amount: 3000, date: "2024-12-01" },
-    { id: 2, description: "Rent", amount: 70000, date: "2024-12-01" },
-    { id: 3, description: "Utilities", amount: 5000, date: "2024-12-02" },
-  ];
+import { Payment } from "../types";
 
+export default function Lists({ payments }: { payments: Payment[] }) {
   return (
-    <div className="space-y-4">
-      {mockPayments.map((payment) => (
-        <div
-          key={payment.id}
-          className="p-4 bg-white shadow rounded-md flex justify-between"
-        >
-          <div>
-            <div className="font-bold">{payment.description}</div>
-            <div className="text-sm text-gray-500">{payment.date}</div>
+    <div className="p-4 bg-gray-50 h-full">
+      <div className="space-y-4">
+        {payments.map((payment) => (
+          <div
+            key={payment.id}
+            className="p-4 bg-white shadow rounded-md flex justify-between"
+          >
+            <div>
+              <div className="font-bold">{payment.description}</div>
+              <div className="text-sm text-gray-500">{payment.date}</div>
+              <div className="text-sm text-gray-500">
+                Category: {payment.categoryName}
+              </div>
+              <div className="text-sm text-gray-500">
+                Tags: {payment.tags.join(", ")}
+              </div>
+            </div>
+            <div className="font-bold text-orange-500">¥{payment.amount}</div>
           </div>
-          <div className="font-bold text-orange-500">¥{payment.amount}</div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

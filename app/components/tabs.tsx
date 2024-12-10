@@ -1,20 +1,18 @@
-// app/components/Tabs.tsx
-import Lists from "./lists";
-import Calender from "./calender";
-import Graph from "./graph";
 import { useState } from "react";
+import Lists from "./lists";
+import { Payment } from "../types";
 
-export default function Tabs() {
+export default function Tabs({ payments }: { payments: Payment[] }) {
   const [activeTab, setActiveTab] = useState("Lists");
 
   const renderTabContent = () => {
     switch (activeTab) {
       case "Lists":
-        return <Lists />;
+        return <Lists payments={payments} />;
       case "Calender":
-        return <Calender />;
+        return <div>Calender View Coming Soon!</div>;
       case "Graph":
-        return <Graph />;
+        return <div>Graph View Coming Soon!</div>;
       default:
         return null;
     }
@@ -48,8 +46,7 @@ export default function Tabs() {
           Graph
         </button>
       </div>
-
-      <div>{renderTabContent()}</div>
+      {renderTabContent()}
     </div>
   );
 }
